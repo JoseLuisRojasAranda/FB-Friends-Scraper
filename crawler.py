@@ -4,12 +4,63 @@ from scrapy import Spider
 from scrapy.utils.response import open_in_browser
 from scrapy.http import FormRequest
 from scrapy.crawler import CrawlerProcess
-
 from selenium import webdriver 
 
+def extractor(testLines):
+    
+    
+    x = -1
+    z = 0
+    #testLines = []
+    #txtTestR_file = open(path,'r') #ABRE EL ARCHIVO ESPESIFICADO EN EL "path"
+   
+    line = []
+    #testLines = txtTestR_file.readlines() #DIVIDE EL HTML EN LINAS DE CODIGO 
+    #testLines = html.readlines() #DIVIDE EL HTML EN LINAS DE CODIGO 
 
-    
-    
+    for i in range (len(testLines)):    #ITERA DESDE LA PRIMERA LINEA HASTA LA ULTIMA DEL HTML
+        #line = testLines[i]              # OBTIENE LA PRIMERA LINEA DEL HTML    
+        x = testLines.find("Vive en ")       #CHECA EN CADA LINEA SI ESTA LA SUBCADENA DESEADA Y REGRESA EL IDICE DINDE SE ENCUENTRA
+        print("------->")
+        print(testLines[i])
+        if x > -1:                      #SI LA ENCUENTRA DETIENE LA BUSQUEDA
+            
+            print("el indice donde esta -Vive en- es:" )
+            print(x)
+            print("")
+            z = testLines.find(">",x,len(testLines)) #BUSCA A PARTIR DEL INDICE vive en HASTA ENTCONTRAR UN '>'
+            print("")
+            print("el indice donde esta la ciudad es:" )
+            print(z)
+            print("")
+            break
+        
+
+   
+    if x == -1:
+        print ("")
+        print ("chale")
+        print ("")
+        return "NoData"
+            
+    w = []
+    j=1
+    places = []
+    place = ''
+
+
+    while  w != "<":
+        #EN EL HTML DE GIL "VIVE EN ESTA EN LA POS 196,048 DE LA LINEA 103"
+        w = testLines[z+j]
+        place += w
+        print (w)
+        j += 1
+        places.append(place)
+
+    place = place.replace("<","")
+    print(place) 
+    return place
+
 
 class FBCrawler(object):
     def __init__(self, driver, email, passw):
@@ -22,25 +73,13 @@ class FBCrawler(object):
         links_list = self.crawl_friends()
 
         all_htmls = []
+
         #for link in links_list:
             #all_htmls.append(self.obtain_friend_data(link))
         # Solo hace 3
-        for i in range(5):
+        for i in range(3):
             all_htmls.append(self.obtain_friend_data(links_list[i]))
-        
-        #print(all_htmls[0])
-
-        with open("htmltest1.txt","w") as writer:
-            writer.write(all_htmls[0])
-
-        with open("htmltest2.txt","w") as writer:
-            writer.write(all_htmls[1])
-        with open("htmltest3.txt","w") as writer:
-            writer.write(all_htmls[2])
-        with open("htmltest4.txt","w") as writer:
-            writer.write(all_htmls[3])
-
-
+    
         return all_htmls
 
     def login_facebook(self):
@@ -69,7 +108,7 @@ class FBCrawler(object):
         user_link = self.driver.current_url
         self.driver.get(user_link+"/friends")
 
-        time.sleep(3) 
+        time.sleep(4) 
 
         self.scroll_to_bottom()
 
@@ -122,11 +161,29 @@ def main():
     friends_data = crawler.friends_links()
 
     
-    #for i in friends_data:
-        #placeList[i] = extractor()
+    #///////////////////////////////////////////////
+
+    d_all_htmls = []
+    d_all_places = []
+
+    for f in range (len(friends_data)):
+        d_all_places.append(extractor(friends_data[f]))
+   
+    #print("hola")
+    #print(d_all_htmls[0])
+    print("")
+    print("ciudades:")
+   
+    for a in range (len(d_all_places)):
+        print(d_all_places[a])
     
-    #for j in placeList:
-        #print(placeList[j])
+    print("")
+    
+    #print("hola")
+    #print(len(testLines))
+    #print(len(d_all_htmls))
+
+    #///////////////////////////////////////////////////////////////////
 
     
     
