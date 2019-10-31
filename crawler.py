@@ -7,8 +7,9 @@ from scrapy.crawler import CrawlerProcess
 
 from selenium import webdriver 
 
-def diego_function(friends_html):
-    print(type(friends_html))
+
+    
+    
 
 class FBCrawler(object):
     def __init__(self, driver, email, passw):
@@ -24,8 +25,21 @@ class FBCrawler(object):
         #for link in links_list:
             #all_htmls.append(self.obtain_friend_data(link))
         # Solo hace 3
-        for i in range(3):
+        for i in range(5):
             all_htmls.append(self.obtain_friend_data(links_list[i]))
+        
+        #print(all_htmls[0])
+
+        with open("htmltest1.txt","w") as writer:
+            writer.write(all_htmls[0])
+
+        with open("htmltest2.txt","w") as writer:
+            writer.write(all_htmls[1])
+        with open("htmltest3.txt","w") as writer:
+            writer.write(all_htmls[2])
+        with open("htmltest4.txt","w") as writer:
+            writer.write(all_htmls[3])
+
 
         return all_htmls
 
@@ -90,21 +104,32 @@ class FBCrawler(object):
         self.driver.get(link)
         about = self.driver.find_element_by_xpath('//*[@data-tab-key="about"]')
         about.click()
-        time.sleep(1)
+        time.sleep(2
+        )
 
         return self.driver.page_source
-
+   
 
 def main():
-    email = input("Email:")
-    passw = input("Password:")
+    #email = input("Email:")
+    #passw = input("Password:")
+    placeList = []
+    email = "superdiegoshowdown@gmail.com"
+    passw = "kinect2401"
     driver = webdriver.Chrome(executable_path="./chromedriver")
     crawler = FBCrawler(driver, email, passw)
 
     friends_data = crawler.friends_links()
 
-    diego_function(friends_data)
+    
+    #for i in friends_data:
+        #placeList[i] = extractor()
+    
+    #for j in placeList:
+        #print(placeList[j])
 
+    
+    
     input("Enter to end")
     driver.quit()
 
