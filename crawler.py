@@ -1,4 +1,5 @@
 import time
+from matplotlib import pyplot as plt
 import scrapy
 from scrapy import Spider
 from scrapy.utils.response import open_in_browser
@@ -18,30 +19,33 @@ def extractor(testLines):
     #testLines = txtTestR_file.readlines() #DIVIDE EL HTML EN LINAS DE CODIGO 
     #testLines = html.readlines() #DIVIDE EL HTML EN LINAS DE CODIGO 
 
-    for i in range (len(testLines)):    #ITERA DESDE LA PRIMERA LINEA HASTA LA ULTIMA DEL HTML
-        #line = testLines[i]              # OBTIENE LA PRIMERA LINEA DEL HTML    
-        x = testLines.find("Vive en ")       #CHECA EN CADA LINEA SI ESTA LA SUBCADENA DESEADA Y REGRESA EL IDICE DINDE SE ENCUENTRA
-        print("------->")
-        print(testLines[i])
-        if x > -1:                      #SI LA ENCUENTRA DETIENE LA BUSQUEDA
-            
-            print("el indice donde esta -Vive en- es:" )
-            print(x)
-            print("")
-            z = testLines.find(">",x,len(testLines)) #BUSCA A PARTIR DEL INDICE vive en HASTA ENTCONTRAR UN '>'
-            print("")
-            print("el indice donde esta la ciudad es:" )
-            print(z)
-            print("")
-            break
-        
+    x = testLines.find("Vive en ")       #CHECA EN CADA LINEA SI ESTA LA SUBCADENA DESEADA Y REGRESA EL IDICE DINDE SE ENCUENTRA
 
-   
     if x == -1:
         print ("")
         print ("chale")
         print ("")
+
         return "NoData"
+    #for i in range (len(testLines)):    #ITERA DESDE LA PRIMERA LINEA HASTA LA ULTIMA DEL HTML
+        #line = testLines[i]              # OBTIENE LA PRIMERA LINEA DEL HTML    
+    #print("------->")
+    #print(testLines[i])
+    if x > -1:                      #SI LA ENCUENTRA DETIENE LA BUSQUEDA
+        
+        #print("el indice donde esta -Vive en- es:" )
+        #print(x)
+        #print("")
+        z = testLines.find(">",x,len(testLines)) #BUSCA A PARTIR DEL INDICE vive en HASTA ENTCONTRAR UN '>'
+        #print("")
+        #print("el indice donde esta la ciudad es:" )
+        #print(z)
+        #print("")
+            #break
+        
+
+   
+    
             
     w = []
     j=1
@@ -53,7 +57,7 @@ def extractor(testLines):
         #EN EL HTML DE GIL "VIVE EN ESTA EN LA POS 196,048 DE LA LINEA 103"
         w = testLines[z+j]
         place += w
-        print (w)
+        #print (w)
         j += 1
         places.append(place)
 
@@ -77,8 +81,9 @@ class FBCrawler(object):
         #for link in links_list:
             #all_htmls.append(self.obtain_friend_data(link))
         # Solo hace 3
-        for i in range(3):
+        for i in range(100):
             all_htmls.append(self.obtain_friend_data(links_list[i]))
+            time.sleep(4) 
     
         return all_htmls
 
@@ -111,6 +116,7 @@ class FBCrawler(object):
         time.sleep(4) 
 
         self.scroll_to_bottom()
+        time.sleep(4) 
 
         #friends_list_item = self.driver.find_elements_by_xpath('//div[@data-testid="friend_list_item"]')
         friends_links = self.driver.find_elements_by_xpath('//*[@class="_5q6s _8o _8t lfloat _ohe"]')
@@ -129,6 +135,7 @@ class FBCrawler(object):
                 pass
 
         print("total friends: {}".format(len(friends_list)))
+        time.sleep(4) 
 
         return friends_list
 
@@ -143,18 +150,15 @@ class FBCrawler(object):
         self.driver.get(link)
         about = self.driver.find_element_by_xpath('//*[@data-tab-key="about"]')
         about.click()
-        time.sleep(2
-        )
+        time.sleep(2)
 
         return self.driver.page_source
    
 
 def main():
-    #email = input("Email:")
-    #passw = input("Password:")
+    email = input("Email:")
+    passw = input("Password:")
     placeList = []
-    email = "superdiegoshowdown@gmail.com"
-    passw = "kinect2401"
     driver = webdriver.Chrome(executable_path="./chromedriver")
     crawler = FBCrawler(driver, email, passw)
 
@@ -165,9 +169,15 @@ def main():
 
     d_all_htmls = []
     d_all_places = []
+    places_dict = {}
 
     for f in range (len(friends_data)):
-        d_all_places.append(extractor(friends_data[f]))
+        key = extractor(friends_data[f])
+        if not key in places_dict:
+            places_dict[key] = 1
+        else:
+            places_dict[key] += 1
+        d_all_places.append(key)
    
     #print("hola")
     #print(d_all_htmls[0])
@@ -178,12 +188,22 @@ def main():
         print(d_all_places[a])
     
     print("")
+    print(places_dict)
     
     #print("hola")
     #print(len(testLines))
     #print(len(d_all_htmls))
 
     #///////////////////////////////////////////////////////////////////
+    print("Creating PIE Chart")
+    labels = []
+    sizes = []
+    for k in places_dict:
+        labels.append(k)
+        sizes.append(places_dict[k])
+
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', shadow=True, startangle=140)
+    plt.savefig("pie.png")
 
     
     
